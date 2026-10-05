@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>My Life Dream Journey V2</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#090d18;
+    font-family:Arial,sans-serif;
+    color:white;
+}
+
+#game{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#screen{
+    position:relative;
+    width:min(100vw,177.78vh);
+    height:min(56.25vw,100vh);
+    overflow:hidden;
+    background:#76c8ff;
+}
+
+/* WORLD */
+
+#world{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    background:
+        linear-gradient(
+            #75c9ff 0%,
+            #a9ddff 43%,
+            #75b95d 43%,
+            #75b95d 100%
+        );
+}
+
+.night{
+    background:
+        linear-gradient(
+            #111b3d 0%,
+            #26335c 43%,
+            #365a39 43%,
+            #365a39 100%
+        ) !important;
+}
+
+#sun{
+    position:absolute;
+    right:5%;
+    top:5%;
+    font-size:clamp(25px,5vw,65px);
+}
+
+#roadH{
+    position:absolute;
+    left:0;
+    right:0;
+    top:57%;
+    height:16%;
+    background:#4e535b;
+    border-top:4px solid #ddd;
+    border-bottom:4px solid #ddd;
+}
+
+#roadH:after{
+    content:"";
+    position:absolute;
+    top:48%;
+    left:0;
+    right:0;
+    border-top:4px dashed #f5d76e;
+}
+
+#roadV{
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:48%;
+    width:10%;
+    background:#50555d;
+    border-left:4px solid #ddd;
+    border-right:4px solid #ddd;
+}
+
+#roadV:after{
+    content:"";
+    position:absolute;
+    left:48%;
+    top:0;
+    bottom:0;
+    border-left:4px dashed #f5d76e;
+}
+
+/* Buildings */
+
+.location{
+    position:absolute;
+    padding:7px 11px;
+    border-radius:10px;
+    background:rgba(255,255,255,.94);
+    color:#111;
+    font-size:clamp(9px,1.2vw,15px);
+    font-weight:bold;
+    box-shadow:0 3px 10px #0005;
+    user-select:none;
+}
+
+#school{left:5%;top:13%}
+#shop{right:5%;top:16%}
+#home{left:5%;bottom:13%}
+#work{right:5%;bottom:13%}
+#park{left:35%;top:10%}
+#hospital{right:31%;top:13%}
+
+/* PLAYER */
+
+#player{
+    position:absolute;
+    width:70px;
+    height:70px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:clamp(40px,6vw,75px);
+    z-index:20;
+    transition:transform .08s linear;
+    user-select:none;
+}
+
+#vehicle{
+    position:absolute;
+    width:85px;
+    height:70px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-size:clamp(38px,6vw,70px);
+    z-index:19;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+}
+
+/* TOP UI */
+
+#top{
+    position:absolute;
+    z-index:50;
+    top:0;
+    left:0;
+    right:0;
+    padding:7px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    background:linear-gradient(#000b,#0000);
+}
+
+.stat{
+    background:#111827dd;
+    border:1px solid #ffffff22;
+    border-radius:9px;
+    padding:5px 9px;
+    font-size:clamp(8px,1.15vw,14px);
+}
+
+#message{
+    position:absolute;
+    z-index:45;
+    top:65px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(60%,500px);
+    text-align:center;
+    padding:8px 12px;
+    border-radius:12px;
+    background:#0009;
+    font-size:clamp(9px,1.25vw,15px);
+}
+
+/* CONTROLS */
+
+#controls{
+    position:absolute;
+    z-index:60;
+    left:2%;
+    bottom:3%;
+    width:120px;
+    height:120px;
+}
+
+.move{
+    position:absolute;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid #ffffff55;
+    background:#111827dd;
+    color:white;
+    font-size:18px;
+    touch-action:none;
+}
+
+#up{left:39px;top:0}
+#down{left:39px;bottom:0}
+#left{left:0;top:39px}
+#right{right:0;top:39px}
+
+#actions{
+    position:absolute;
+    z-index:60;
+    right:2%;
+    bottom:3%;
+    display:grid;
+    grid-template-columns:repeat(2,70px);
+    gap:7px;
+}
+
+.action{
+    min-height:43px;
+    border:0;
+    border-radius:10px;
+    background:#111827dd;
+    color:white;
+    font-weight:bold;
+    font-size:10px;
+    touch-action:manipulation;
+}
+
+.action:disabled{
+    opacity:.35;
+}
+
+/* MENU */
+
+#menu{
+    position:absolute;
+    z-index:100;
+    right:2%;
+    top:50px;
+    width:230px;
+    max-height:75%;
+    overflow:auto;
+    padding:10px;
+    border-radius:15px;
+    background:#0b1220ee;
+    border:1px solid #ffffff22;
+    display:none;
+}
+
+#menu button{
+    width:100%;
+    margin:4px 0;
+    min-height:38px;
+    border:0;
+    border-radius:9px;
+    background:#26344d;
+    color:white;
+    font-weight:bold;
+}
+
+#log{
+    margin-top:8px;
+    padding:9px;
+    border-radius:8px;
+    background:#0006;
+    font-size:12px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:600px){
+    #actions{
+        grid-template-columns:repeat(2,60px);
+    }
+
+    #controls{
+        transform:scale(.85);
+        transform-origin:bottom left;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<div id="screen">
+
+<div id="world">
+
+<div id="sun">☀️</div>
+
+<div id="roadH"></div>
+<div id="roadV"></div>
+
+<div id="school" class="location">🏫 School</div>
+<div id="shop" class="location">🛒 Shop</div>
+<div id="home" class="location">🏠 Home</div>
+<div id="work" class="location">🏢 Work</div>
+<div id="park" class="location">🌳 Park</div>
+<div id="hospital" class="location">🏥 Hospital</div>
+
+<div id="vehicle">🏍️</div>
+<div id="player">👶</div>
+
+</div>
+
+<div id="top">
+
+<div class="stat">🎂 <span id="age">1</span></div>
+<div class="stat">💰 <span id="money">100</span></div>
+<div class="stat">❤️ <span id="happy">80</span></div>
+<div class="stat">⚡ <span id="energy">100</span></div>
+<div class="stat">⭐ <span id="level">1</span></div>
+<div class="stat">📅 Day <span id="day">1</span></div>
+
+<button id="menuBtn" class="action">☰ MENU</button>
+
+</div>
+
+<div id="message">
+জীবন শুরু হয়েছে 👶 — joystick দিয়ে চরিত্রটি move করো!
+</div>
+
+<!-- JOYSTICK -->
+
+<div id="controls">
+
+<button class="move" id="up">▲</button>
+<button class="move" id="left">◀</button>
+<button class="move" id="right">▶</button>
+<button class="move" id="down">▼</button>
+
+</div>
+
+<!-- ACTIONS -->
+
+<div id="actions">
+
+<button class="action" id="ageBtn">🎂 Grow</button>
+<button class="action" id="interactBtn">🔎 Action</button>
+<button class="action" id="vehicleBtn">🏍️ Ride</button>
+<button class="action" id="sleepBtn">😴 Sleep</button>
+
+</div>
+
+<!-- MENU -->
+
+<div id="menu">
+
+<button id="studyBtn">📚 Study</button>
+<button id="workBtn">💼 Work</button>
+<button id="shopBtn">🛒 Shopping</button>
+<button id="bikeBtn">🏍️ Buy Bike</button>
+<button id="carBtn">🚗 Buy Car</button>
+<button id="meetBtn">❤️ Meet Someone</button>
+<button id="marryBtn">💍 Marriage</button>
+<button id="familyBtn">👨‍👩‍👧 Family</button>
+<button id="saveBtn">💾 Save Game</button>
+<button id="loadBtn">📂 Load Game</button>
+
+<div id="log">
+তোমার জীবনযাত্রা এখানে দেখা যাবে।
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   GAME DATA
+========================= */
+
+const state = {
+
+    age:1,
+    money:100,
+    happy:80,
+    energy:100,
+    level:1,
+    day:1,
+
+    x:50,
+    y:50,
+
+    bike:false,
+    car:false,
+
+    relationship:false,
+    married:false,
+    family:false,
+
+    riding:false
+
+};
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const screen=document.getElementById("screen");
+const world=document.getElementById("world");
+const player=document.getElementById("player");
+const vehicle=document.getElementById("vehicle");
+
+const message=document.getElementById("message");
+const menu=document.getElementById("menu");
+
+const ageEl=document.getElementById("age");
+const moneyEl=document.getElementById("money");
+const happyEl=document.getElementById("happy");
+const energyEl=document.getElementById("energy");
+const levelEl=document.getElementById("level");
+const dayEl=document.getElementById("day");
+
+/* =========================
+   HELPERS
+========================= */
+
+function clamp(v,min,max){
+    return Math.max(min,Math.min(max,v));
+}
+
+function say(text){
+
+    message.textContent=text;
+
+    const log=document.getElementById("log");
+
+    log.textContent=text;
+
+}
+
+function update(){
+
+    state.happy=clamp(state.happy,0,100);
+    state.energy=clamp(state.energy,0,100);
+
+    ageEl.textContent=state.age;
+    moneyEl.textContent=Math.floor(state.money);
+    happyEl.textContent=state.happy;
+    energyEl.textContent=state.energy;
+    levelEl.textContent=state.level;
+    dayEl.textContent=state.day;
+
+    /* Character */
+
+    if(state.age<5){
+        player.textContent="👶";
+    }
+    else if(state.age<13){
+        player.textContent="🧒";
+    }
+    else if(state.age<18){
+        player.textContent="🧑";
+    }
+    else{
+        player.textContent="🧑";
+    }
+
+    /* Vehicle */
+
+    if(state.car){
+        vehicle.textContent="🚗";
+    }
+    else{
+        vehicle.textContent="🏍️";
+    }
+
+    if(state.riding){
+
+        vehicle.style.display="flex";
+
+    }
+    else{
+
+        vehicle.style.display="none";
+
+    }
+
+    movePlayer(0,0);
+
+}
+
+/* =========================
+   MOVEMENT
+========================= */
+
+let moving={up:false,down:false,left:false,right:false};
+
+const speed=0.45;
+
+function movePlayer(dx,dy){
+
+    state.x=clamp(state.x+dx,5,95);
+    state.y=clamp(state.y+dy,10,90);
+
+    player.style.left=state.x+"%";
+    player.style.top=state.y+"%";
+
+    if(state.riding){
+
+        vehicle.style.left=state.x+"%";
+        vehicle.style.top=state.y+"%";
+
+    }
+
+}
+
+function movementLoop(){
+
+    let dx=0;
+    let dy=0;
+
+    if(moving.up)dy-=speed;
+    if(moving.down)dy+=speed;
+    if(moving.left)dx-=speed;
+    if(moving.right)dx+=speed;
+
+    if(dx!==0 || dy!==0){
+
+        movePlayer(dx,dy);
+
+        state.energy-=0.015;
+
+    }
+
+    requestAnimationFrame(movementLoop);
+
+}
+
+movementLoop();
+
+/* =========================
+   BUTTON MOVEMENT
+========================= */
+
+function holdButton(id,direction){
+
+    const btn=document.getElementById(id);
+
+    btn.addEventListener("pointerdown",e=>{
+        e.preventDefault();
+        moving[direction]=true;
+    });
+
+    btn.addEventListener("pointerup",e=>{
+        e.preventDefault();
+        moving[direction]=false;
+    });
+
+    btn.addEventListener("pointercancel",()=>{
+        moving[direction]=false;
+    });
+
+    btn.addEventListener("pointerleave",()=>{
+        moving[direction]=false;
+    });
+
+}
+
+holdButton("up","up");
+holdButton("down","down");
+holdButton("left","left");
+holdButton("right","right");
+
+/* Keyboard */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="ArrowUp" || e.key==="w")
+        moving.up=true;
+
+    if(e.key==="ArrowDown" || e.key==="s")
+        moving.down=true;
+
+    if(e.key==="ArrowLeft" || e.key==="a")
+        moving.left=true;
+
+    if(e.key==="ArrowRight" || e.key==="d")
+        moving.right=true;
+
+});
+
+document.addEventListener("keyup",e=>{
+
+    if(e.key==="ArrowUp" || e.key==="w")
+        moving.up=false;
+
+    if(e.key==="ArrowDown" || e.key==="s")
+        moving.down=false;
+
+    if(e.key==="ArrowLeft" || e.key==="a")
+        moving.left=false;
+
+    if(e.key==="ArrowRight" || e.key==="d")
+        moving.right=false;
+
+});
+
+/* =========================
+   GROW
+========================= */
+
+document.getElementById("ageBtn").onclick=()=>{
+
+    state.age++;
+    state.level++;
+
+    if(state.age===5){
+
+        say("🏫 তুমি এখন স্কুলে যেতে শুরু করেছো!");
+
+    }
+    else if(state.age===13){
+
+        say("🧒 তুমি কিশোর বয়সে পৌঁছেছো।");
+
+    }
+    else if(state.age===18){
+
+        say("🎓 তুমি এখন প্রাপ্তবয়স্ক। Career শুরু করতে পারো!");
+
+    }
+    else{
+
+        say("🎂 তোমার বয়স এখন "+state.age+" বছর!");
+
+    }
+
+    update();
+
+};
+
+/* =========================
+   INTERACTION
+========================= */
+
+document.getElementById("interactBtn").onclick=()=>{
+
+    const x=state.x;
+    const y=state.y;
+
+    if(x<25 && y<35){
+
+        if(state.age<5){
+
+            say("তুমি এখনও খুব ছোট। একটু বড় হও!");
+
+        }
+        else{
+
+            study();
+
+        }
+
+        return;
+    }
+
+    if(x>70 && y<40){
+
+        shopping();
+
+        return;
+
+    }
+
+    if(x<25 && y>65){
+
+        goHome();
+
+        return;
+
+    }
+
+    if(x>70 && y>65){
+
+        work();
+
+        return;
+
+    }
+
+    if(x>30 && x<65 && y<35){
+
+        park();
+
+        return;
+
+    }
+
+    say("এখানে এখন কিছু করার নেই। কাছের কোনো location-এ যাও!");
+
+};
+
+/* =========================
+   STUDY
+========================= */
+
+function study(){
+
+    if(state.age>=18){
+
+        say("🎓 School life শেষ। এখন কাজ করে career তৈরি করো!");
+
+        return;
+
+    }
+
+    if(state.energy<15){
+
+        say("⚡ Energy কম। আগে ঘুমাও।");
+
+        return;
+
+    }
+
+    state.energy-=15;
+    state.money+=50;
+    state.happy+=5;
+
+    say("📚 তুমি পড়াশোনা করেছো এবং নতুন skill পেয়েছো!");
+
+    update();
+
+}
+
+document.getElementById("studyBtn").onclick=study;
+
+/* =========================
+   WORK
+========================= */
+
+function work(){
+
+    if(state.age<18){
+
+        say("🔒 কাজের option 18 বছর বয়সের পর unlock হবে.");
+
+        return;
+
+    }
+
+    if(state.energy<20){
+
+        say("⚡ Energy কম। আগে বিশ্রাম নাও.");
+
+        return;
+
+    }
+
+    state.energy-=20;
+    state.money+=600;
+
+    state.happy-=2;
+
+    say("💼 তুমি আজ কাজ করে 600 টাকা আয় করেছো!");
+
+    update();
+
+}
+
+document.getElementById("workBtn").onclick=work;
+
+/* =========================
+   SHOP
+========================= */
+
+function shopping(){
+
+    if(state.money<100){
+
+        say("💰 Shopping করার জন্য অন্তত 100 টাকা দরকার।");
+
+        return;
+
+    }
+
+    state.money-=100;
+    state.happy+=8;
+
+    say("🛒 তুমি shopping করেছো!");
+
+    update();
+
+}
+
+document.getElementById("shopBtn").onclick=shopping;
+
+/* =========================
+   PARK
+========================= */
+
+function park(){
+
+    state.happy+=12;
+    state.energy-=8;
+
+    say("🌳 তুমি Park-এ ঘুরে বেড়াচ্ছো!");
+
+    update();
+
+}
+
+/* =========================
+   HOME
+========================= */
+
+function goHome(){
+
+    state.energy+=30;
+    state.happy+=5;
+
+    say("🏠 তুমি নিজের বাড়িতে ফিরে এসেছো।");
+
+    update();
+
+}
+
+/* =========================
+   VEHICLE
+========================= */
+
+document.getElementById("vehicleBtn").onclick=()=>{
+
+    if(!state.bike && !state.car){
+
+        say("🏍️ আগে Bike বা Car কিনতে হবে!");
+
+        return;
+
+    }
+
+    state.riding=!state.riding;
+
+    if(state.riding){
+
+        say(state.car ?
+            "🚗 তুমি এখন Car নিয়ে drive করছো!" :
+            "🏍️ তুমি এখন Bike চালাচ্ছো!");
+
+    }
+    else{
+
+        say("🅿️ তুমি vehicle থেকে নেমে গেছো.");
+
+    }
+
+    update();
+
+};
+
+/* =========================
+   BUY BIKE
+========================= */
+
+document.getElementById("bikeBtn").onclick=()=>{
+
+    if(state.age<16){
+
+        say("🏍️ Bike কেনার জন্য আরও বড় হতে হবে.");
+
+        return;
+
+    }
+
+    if(state.money<1500){
+
+        say("💰 Bike কিনতে 1500 টাকা দরকার.");
+
+        return;
+
+    }
+
+    state.money-=1500;
+    state.bike=true;
+
+    say("🎉 তুমি তোমার নিজের Bike কিনেছো!");
+
+    update();
+
+};
+
+/* =========================
+   BUY CAR
+========================= */
+
+document.getElementById("carBtn").onclick=()=>{
+
+    if(state.age<18){
+
+        say("🚗 Car option adult হওয়ার পর unlock হবে.");
+
+        return;
+
+    }
+
+    if(state.money<8000){
+
+        say("💰 Car কিনতে 8000 টাকা দরকার.");
+
+        return;
+
+    }
+
+    state.money-=8000;
+    state.car=true;
+
+    say("🚗 অভিনন্দন! তোমার নতুন Car হয়েছে!");
+
+    update();
+
+};
+
+/* =========================
+   ADULT RELATIONSHIP
+========================= */
+
+document.getElementById("meetBtn").onclick=()=>{
+
+    if(state.age<18){
+
+        say("❤️ এই option adult হওয়ার পর unlock হবে.");
+
+        return;
+
+    }
+
+    state.relationship=true;
+    state.happy+=12;
+
+    say("❤️ তুমি একজন adult companion-এর সাথে পরিচিত হয়েছো.");
+
+    update();
+
+};
+
+/* =========================
+   MARRIAGE
+========================= */
+
+document.getElementById("marryBtn").onclick=()=>{
+
+    if(state.age<18){
+
+        say("💍 Marriage adult হওয়ার পর unlock হবে.");
+
+        return;
+
+    }
+
+    if(!state.relationship){
+
+        say("❤️ আগে একজন adult companion-এর সাথে পরিচিত হও.");
+
+        return;
+
+    }
+
+    if(state.married){
+
+        say("💍 তুমি ইতিমধ্যেই married.");
+
+        return;
+
+    }
+
+    state.married=true;
+    state.happy+=15;
+
+    say("💍 তোমরা বিয়ে করে নতুন জীবন শুরু করলে ❤️🏠");
+
+    update();
+
+};
+
+/* =========================
+   FAMILY
+========================= */
+
+document.getElementById("familyBtn").onclick=()=>{
+
+    if(!state.married){
+
+        say("👨‍👩‍👧 Family life-এর আগে marriage প্রয়োজন.");
+
+        return;
+
+    }
+
+    state.family=true;
+    state.happy+=15;
+
+    say("👨‍👩‍👧 তোমাদের নতুন family life শুরু হয়েছে!");
+
+    update();
+
+};
+
+/* =========================
+   SLEEP / NEXT DAY
+========================= */
+
+document.getElementById("sleepBtn").onclick=()=>{
+
+    state.day++;
+    state.energy=100;
+    state.happy+=5;
+
+    say("😴 তুমি ঘুমিয়ে নতুন দিন শুরু করেছো। Day "+state.day);
+
+    if(state.day%3===0){
+
+        world.classList.toggle("night");
+
+        document.getElementById("sun").textContent=
+            world.classList.contains("night") ? "🌙":"☀️";
+
+    }
+
+    update();
+
+};
+
+/* =========================
+   MENU
+========================= */
+
+document.getElementById("menuBtn").onclick=()=>{
+
+    menu.style.display=
+        menu.style.display==="block" ? "none":"block";
+
+};
+
+/* =========================
+   SAVE
+========================= */
+
+document.getElementById("saveBtn").onclick=()=>{
+
+    try{
+
+        localStorage.setItem(
+            "myLifeV2",
+            JSON.stringify(state)
+        );
+
+        say("💾 Game saved successfully!");
+
+    }
+    catch(e){
+
+        say("Save করা সম্ভব হয়নি।");
+
+    }
+
+};
+
+/* =========================
+   LOAD
+========================= */
+
+document.getElementById("loadBtn").onclick=()=>{
+
+    try{
+
+        const saved=localStorage.getItem("myLifeV2");
+
+        if(!saved){
+
+            say("📂 কোনো saved game পাওয়া যায়নি.");
+
+            return;
+
+        }
+
+        const data=JSON.parse(saved);
+
+        Object.assign(state,data);
+
+        say("📂 Saved game loaded!");
+
+        update();
+
+    }
+    catch(e){
+
+        say("Saved game load করা যায়নি.");
+
+    }
+
+};
+
+/* =========================
+   INITIALIZE
+========================= */
+
+update();
+
+</script>
+
+</body>
+</html>
